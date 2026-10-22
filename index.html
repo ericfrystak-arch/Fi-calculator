@@ -11,15 +11,17 @@ html{scroll-padding-top:env(safe-area-inset-top,0px)}
 *,*::before,*::after{box-sizing:inherit}
 body{margin:0;background:var(--bg);color:#e8e0d4;font-family:'DM Mono',ui-monospace,Menlo,monospace;padding:40px 24px 60px;min-height:100vh}
 .w{max-width:740px;margin:0 auto}
+.top{display:flex;justify-content:flex-end;margin-bottom:20px}
+.mode{min-height:44px;padding:10px 18px;border-radius:999px;border:1px solid var(--gold);background:var(--card);color:var(--gold);font:500 13px 'DM Mono',ui-monospace,monospace;cursor:pointer}
 .eyebrow{font-size:11px;color:var(--gold);letter-spacing:.15em;text-transform:uppercase;margin-bottom:8px}
 h1{font-family:'Playfair Display',Georgia,serif;font-size:clamp(26px,5vw,40px);color:#f0ebe3;margin:0 0 8px;line-height:1.1;font-weight:900}
-h1 span{color:var(--gold)}
+h1 #ttl{color:var(--gold)}
 .sub{color:#777;font-size:12px;margin:0 0 36px;line-height:1.6}
 .ctl{display:flex;flex-direction:column;gap:12px;margin-bottom:36px}
 .box{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:18px 20px}
-.row{display:flex;justify-content:space-between;align-items:baseline;margin-bottom:16px}
+.row{display:flex;justify-content:space-between;align-items:baseline;margin-bottom:16px;gap:12px}
 .lab{font-size:11px;color:#777;letter-spacing:.1em;text-transform:uppercase}
-.val{font-size:24px;color:var(--gold);font-weight:500}
+.val{font-size:24px;color:var(--gold);font-weight:500;white-space:nowrap}
 .mm{display:flex;justify-content:space-between;margin-top:4px;font-size:9px;color:#666}
 input[type=range]{-webkit-appearance:none;appearance:none;width:100%;height:6px;border-radius:3px;background:rgba(255,255,255,.1);outline:none;margin:12px 0}
 input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:28px;height:28px;border-radius:50%;background:#1a1916;border:2px solid var(--gold);box-shadow:0 0 0 4px #c8b89a22,0 2px 8px rgba(0,0,0,.6)}
@@ -56,30 +58,61 @@ input[type=range]::-moz-range-thumb{width:28px;height:28px;border-radius:50%;bac
 .tr.h{font-size:10px;color:#666;letter-spacing:.1em;text-transform:uppercase;border-bottom:1px solid rgba(255,255,255,.06);cursor:default}
 .tr span+span{text-align:right}
 .foot{font-size:10px;color:#555;text-align:center;margin-top:20px}
+
+/* ---------- Kids mode ---------- */
+#kid{display:none}
+body.kids{--bg:#e6f4ff;--gold:#ff5d73;--card:#ffffff;--line:#bfe0f7;background:var(--bg);color:#2b2a6b;font-family:ui-rounded,'Arial Rounded MT Bold','Nunito',system-ui,sans-serif}
+.kids .mode{background:#ff5d73;border-color:#ff5d73;color:#fff;font-family:inherit;font-weight:700}
+.kids .eyebrow{letter-spacing:.04em;text-transform:none;font-size:14px;font-weight:700}
+.kids h1{font-family:inherit;color:#2b2a6b;font-weight:800}
+.kids h1 #ttl{color:#ff5d73}
+.kids .sub{color:#5b5a99;font-size:14px}
+.kids .lab{color:#4a4990;letter-spacing:0;text-transform:none;font-size:15px;font-weight:700}
+.kids .val{font-weight:800}
+.kids .mm{color:#7a79b0;font-size:11px}
+.kids .box{border-width:2px;border-radius:18px}
+.kids input[type=range]{background:#bfe0f7;height:8px}
+.kids input[type=range]::-webkit-slider-thumb{background:#fff;border-color:#ff5d73;box-shadow:0 0 0 4px #ffd23f,0 2px 8px rgba(43,42,107,.25)}
+.kids input[type=range]::-moz-range-thumb{background:#fff;border-color:#ff5d73}
+.kids .ent small{color:#5b5a99}
+.kids .ent input{background:#fff;border:2px solid #bfe0f7;color:#2b2a6b;font-family:inherit;font-weight:700}
+.kids .hint{color:#5b5a99;font-size:13px}
+.kids .chart,.kids #card,.kids .tbl,.kids .foot{display:none}
+.kids #kid{display:block;margin-bottom:24px}
+.kid{background:#fff;border:2px solid #ffd23f;border-radius:22px;padding:24px}
+.kid .big{font-size:clamp(34px,9vw,52px);font-weight:800;color:#ff5d73;line-height:1.1;margin:6px 0 18px}
+.pb{height:20px;border-radius:10px;background:#e6f4ff;overflow:hidden;margin-top:8px}
+.pb i{display:block;height:100%;border-radius:10px;background:#ffd23f;transition:width .5s cubic-bezier(.4,0,.2,1)}
+.kid .msg{font-size:16px;line-height:1.5;margin:16px 0 0;color:#2b2a6b;font-weight:700}
+.kidfoot{display:none;font-size:12px;color:#5b5a99;text-align:center;margin-top:20px}
+.kids .kidfoot{display:block}
 </style>
 </head>
 <body>
 <div class="w">
-  <div class="eyebrow">Financial Independence Analysis</div>
-  <h1>Contribution Impact<span id="ttl"></span></h1>
+  <div class="top"><button type="button" class="mode" id="mode"></button></div>
+  <div class="eyebrow" id="eb"></div>
+  <h1><span id="h1t"></span><span id="ttl"></span></h1>
   <p class="sub" id="sub"></p>
 
   <div class="ctl">
-    <div class="box"><div class="row"><div class="lab">Current Age</div><div class="val" id="v-cur"></div></div>
+    <div class="box"><div class="row"><div class="lab" id="l-cur"></div><div class="val" id="v-cur"></div></div>
       <input type="range" id="cur" min="5" max="80" step="1"><div class="mm"><span>Age 5</span><span>Age 80</span></div></div>
-    <div class="box"><div class="row"><div class="lab">Retire Age</div><div class="val" id="v-ret"></div></div>
+    <div class="box"><div class="row"><div class="lab" id="l-ret"></div><div class="val" id="v-ret"></div></div>
       <input type="range" id="ret" min="18" max="90" step="1"><div class="mm"><span>Age 18</span><span>Age 90</span></div></div>
     <div class="g2">
-      <div class="box"><div class="lab" style="margin-bottom:12px">Starting Balance</div>
+      <div class="box"><div class="lab" id="l-bal" style="margin-bottom:12px"></div>
         <div class="ent"><b>$</b><input id="bal" type="text" inputmode="numeric"></div><div class="hint" id="h-bal"></div></div>
-      <div class="box"><div class="lab" style="margin-bottom:12px">Monthly Contribution</div>
+      <div class="box"><div class="lab" id="l-con" style="margin-bottom:12px"></div>
         <div class="ent"><b>$</b><input id="con" type="text" inputmode="numeric"><small>/mo</small></div><div class="hint" id="h-con"></div></div>
     </div>
-    <div class="box"><div class="lab" style="margin-bottom:12px">Estimated Annual Expenses in Retirement</div>
+    <div class="box"><div class="lab" id="l-exp" style="margin-bottom:12px"></div>
       <div class="ent"><b>$</b><input id="exp" type="text" inputmode="numeric"><small>/yr</small></div><div class="hint" id="h-exp"></div></div>
-    <div class="box"><div class="row"><div class="lab">Growth Rate</div><div class="val" id="v-rate"></div></div>
+    <div class="box"><div class="row"><div class="lab" id="l-rate"></div><div class="val" id="v-rate"></div></div>
       <input type="range" id="rate" min="1" max="15" step="0.5"><div class="mm"><span>1%</span><span>15%</span></div></div>
   </div>
+
+  <div id="kid"></div>
 
   <div class="chart">
     <div class="plot"><div class="yax" id="yax"></div><div class="bars"><div id="gl"></div><div class="bi" id="bi"></div></div></div>
@@ -93,11 +126,18 @@ input[type=range]::-moz-range-thumb{width:28px;height:28px;border-radius:50%;bac
   <div id="card"></div>
   <div class="tbl" id="tbl"></div>
   <div class="foot" id="foot"></div>
+  <div class="kidfoot">Pretend numbers to practice with. Not real financial advice.</div>
 </div>
 
 <script>
 var COLORS=["#c8b89a","#a8c5a0","#7eb8c9","#9b8ec4","#d4826a"], CH=260;
 var s={cur:35,ret:65,bal:0,con:0,exp:0,rate:8,hover:null};
+var kids=false, saved=null;
+var KID_DEFAULTS={cur:10,ret:50,bal:100,con:100,exp:12000,rate:8};
+var TEXT={
+  n:{eb:"Financial Independence Analysis",h1t:"Contribution Impact","l-cur":"Current Age","l-ret":"Retire Age","l-bal":"Starting Balance","l-con":"Monthly Contribution","l-exp":"Estimated Annual Expenses in Retirement","l-rate":"Growth Rate",mode:"Kids mode"},
+  k:{eb:"Money magic for kids",h1t:"Make your money grow","l-cur":"How old are you now?","l-ret":"Age you want to stop working","l-bal":"Money you have now","l-con":"Money you save each month","l-exp":"Money you'd spend each year","l-rate":"How fast your money grows",mode:"Back to grown-up mode"}
+};
 var $=function(id){return document.getElementById(id)};
 
 function fv(b,m,rate,y){if(y<=0)return b;var r=rate/12,n=y*12,g=Math.pow(1+r,n);return b*g+(m>0?m*((g-1)/r):0)}
@@ -107,20 +147,30 @@ function fmtBal(v){if(v>=1e6)return "$"+(v/1e6).toFixed(2)+"M";if(v>=1e3)return 
 function fmtCon(v){if(v===0)return "$0/mo";if(v>=1e3)return "$"+(v/1e3).toFixed(1)+"K/mo";return "$"+v+"/mo"}
 function num(t){var n=Number(String(t).replace(/,/g,""));return isNaN(n)?null:Math.max(0,n)}
 
+function applyText(){
+  var t=kids?TEXT.k:TEXT.n;
+  Object.keys(t).forEach(function(k){$(k==="mode"||k==="eb"||k==="h1t"?k:k).textContent=t[k]});
+}
+
 function render(){
+  applyText();
   var years=Math.max(s.ret-s.cur,0), r=s.rate/100, b=s.con;
   var sc=[["$0/mo","Coast FI",0],[fmtCon(Math.round(b*.5)),"Half",b*.5],[fmtCon(b),"Base",b],[fmtCon(Math.round(b*1.5)),"1.5×",b*1.5],[fmtCon(b*2),"2×",b*2]]
     .map(function(x,i){return {label:x[0],sub:x[1],color:COLORS[i],value:fv(s.bal,x[2],r,years)}});
   var coast=sc[0].value, max=Math.max.apply(null,sc.map(function(x){return x.value})), gm=max*1.12||1;
   var gv=[0,1,2,3,4].map(function(i){return gm/4*i});
 
-  $("ttl").textContent=" · Age "+s.cur+" → "+s.ret;
-  $("sub").textContent=years+" years · "+s.rate+"% growth · "+fmtBal(s.bal)+" starting balance";
+  $("ttl").textContent=kids?" · Age "+s.cur+" to "+s.ret:" · Age "+s.cur+" → "+s.ret;
+  $("sub").textContent=kids
+    ?years+" years of growing · "+s.rate+"% a year · starting with "+fmtBal(s.bal)
+    :years+" years · "+s.rate+"% growth · "+fmtBal(s.bal)+" starting balance";
   $("v-cur").textContent="Age "+s.cur; $("v-ret").textContent="Age "+s.ret; $("v-rate").textContent=s.rate+"%";
   $("h-bal").textContent=fmtBal(s.bal); $("h-con").textContent=fmtCon(s.con);
   var fi=s.exp/.04;
   function swr(v){return fmt(v*.04)+"/yr"}
-  $("h-exp").textContent="FI number: "+fmt(fi)+" (25× expenses, 4% rule)";
+  $("h-exp").textContent=kids
+    ?"Your goal: "+fmt(fi)+". That's enough to pay your bills forever!"
+    :"FI number: "+fmt(fi)+" (25× expenses, 4% rule)";
   $("foot").textContent="Not financial advice · "+s.rate+"% nominal annual growth · constant contributions · age "+s.cur+" today";
 
   $("yax").innerHTML=gv.map(function(v){return "<div>"+fmtShort(v)+"</div>"}).join("");
@@ -145,7 +195,39 @@ function render(){
     +sc.map(function(x,i){var d=x.value-coast;
       return '<div class="tr" data-i="'+i+'" style="'+(h===i?'background:rgba(255,255,255,.03)':'')+'"><span style="color:'+x.color+'">'+x.sub+' · '+x.label+'</span>'
       +'<span>'+fmt(x.value)+'</span><span style="color:'+(d===0?'#555':'#a8c5a0')+'">'+(d===0?"—":"+"+fmt(d))+'</span><span style="color:'+(fi>0&&x.value>=fi?'#a8c5a0':'#999')+'">'+swr(x.value)+'</span></div>'}).join("");
+
+  // Kids result panel
+  if(kids){
+    var val=sc[2].value, pct=fi>0?Math.min(val/fi*100,100):0, msg;
+    if(fi<=0) msg="Type in what you'd spend each year to set a goal.";
+    else if(val>=fi) msg="You hit your goal! Your money can now pay your bills forever.";
+    else msg="You're "+Math.floor(pct)+"% of the way to your goal. Try saving more each month or starting earlier!";
+    $("kid").innerHTML='<div class="kid"><div class="lab">By age '+s.ret+' you could have</div>'
+      +'<div class="big">'+fmt(val)+'</div>'
+      +'<div class="lab">Your goal: '+fmt(fi)+'</div>'
+      +'<div class="pb"><i style="width:'+pct+'%"></i></div>'
+      +'<p class="msg">'+msg+'</p></div>';
+  } else $("kid").innerHTML="";
 }
+
+function sync(){
+  $("cur").value=s.cur; $("ret").value=s.ret; $("rate").value=s.rate;
+  ["bal","con","exp"].forEach(function(k){$(k).value=s[k].toLocaleString()});
+}
+function setKids(on){
+  kids=on;
+  if(on){
+    saved={cur:s.cur,ret:s.ret,bal:s.bal,con:s.con,exp:s.exp,rate:s.rate};
+    for(var k in KID_DEFAULTS) s[k]=KID_DEFAULTS[k];
+  } else if(saved){
+    for(var k2 in saved) s[k2]=saved[k2];
+  }
+  s.hover=null;
+  document.body.classList.toggle("kids",on);
+  document.documentElement.style.colorScheme=on?"light":"dark";
+  sync(); render();
+}
+$("mode").addEventListener("click",function(){setKids(!kids)});
 
 function pick(e){var t=e.target.closest("[data-i]");if(!t)return;var i=+t.getAttribute("data-i");s.hover=s.hover===i?null:i;render()}
 ["bi","xl","tbl"].forEach(function(id){$(id).addEventListener("click",pick)});
