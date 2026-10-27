@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>FI Calculator v2</title>
+<title>FI Calculator</title>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Playfair+Display:wght@700;900&display=swap">
 <style>
 :root{--bg:#0f0e0c;--gold:#c8b89a;--card:rgba(255,255,255,.03);--line:rgba(255,255,255,.07);box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px);color-scheme:dark}
@@ -77,13 +77,16 @@ body.kids{--bg:#e6f4ff;--gold:#ff5d73;--card:#ffffff;--line:#bfe0f7;background:v
 .kids .ent small{color:#5b5a99}
 .kids .ent input{background:#fff;border:2px solid #bfe0f7;color:#2b2a6b;font-family:inherit;font-weight:700}
 .kids .hint{color:#5b5a99;font-size:13px}
-.kids .chart,.kids #card,.kids .tbl,.kids .foot{display:none}
+.kids .chart,.kids #card,.kids .tbl,.kids .foot,.kids #b-exp{display:none}
 .kids #kid{display:block;margin-bottom:24px}
 .kid{background:#fff;border:2px solid #ffd23f;border-radius:22px;padding:24px}
 .kid .big{font-size:clamp(34px,9vw,52px);font-weight:800;color:#ff5d73;line-height:1.1;margin:6px 0 18px}
 .pb{height:20px;border-radius:10px;background:#e6f4ff;overflow:hidden;margin-top:8px}
 .pb i{display:block;height:100%;border-radius:10px;background:#ffd23f;transition:width .5s cubic-bezier(.4,0,.2,1)}
-.kid .msg{font-size:16px;line-height:1.5;margin:16px 0 0;color:#2b2a6b;font-weight:700}
+.kid .cmp{font-size:20px;line-height:1.4;margin:0 0 16px;color:#2b2a6b;font-weight:800}
+.kid .sum{font-size:16px;line-height:1.5;margin:0 0 18px;color:#4a4990;font-weight:700}
+.kid .more{min-height:44px;padding:10px 20px;border-radius:999px;border:2px solid #ff5d73;background:#fff;color:#ff5d73;font:700 15px ui-rounded,'Arial Rounded MT Bold',system-ui,sans-serif;cursor:pointer}
+.kid .more:active{background:#ff5d73;color:#fff}
 .kidfoot{display:none;font-size:12px;color:#5b5a99;text-align:center;margin-top:20px}
 .kids .kidfoot{display:block}
 </style>
@@ -99,14 +102,14 @@ body.kids{--bg:#e6f4ff;--gold:#ff5d73;--card:#ffffff;--line:#bfe0f7;background:v
     <div class="box"><div class="row"><div class="lab" id="l-cur"></div><div class="val" id="v-cur"></div></div>
       <input type="range" id="cur" min="5" max="80" step="1"><div class="mm"><span>Age 5</span><span>Age 80</span></div></div>
     <div class="box"><div class="row"><div class="lab" id="l-ret"></div><div class="val" id="v-ret"></div></div>
-      <input type="range" id="ret" min="18" max="90" step="1"><div class="mm"><span>Age 18</span><span>Age 90</span></div></div>
+      <input type="range" id="ret" min="18" max="90" step="1"><div class="mm"><span id="mm-a">Age 18</span><span id="mm-b">Age 90</span></div></div>
     <div class="g2">
       <div class="box"><div class="lab" id="l-bal" style="margin-bottom:12px"></div>
         <div class="ent"><b>$</b><input id="bal" type="text" inputmode="numeric"></div><div class="hint" id="h-bal"></div></div>
       <div class="box"><div class="lab" id="l-con" style="margin-bottom:12px"></div>
         <div class="ent"><b>$</b><input id="con" type="text" inputmode="numeric"><small>/mo</small></div><div class="hint" id="h-con"></div></div>
     </div>
-    <div class="box"><div class="lab" id="l-exp" style="margin-bottom:12px"></div>
+    <div class="box" id="b-exp"><div class="lab" id="l-exp" style="margin-bottom:12px"></div>
       <div class="ent"><b>$</b><input id="exp" type="text" inputmode="numeric"><small>/yr</small></div><div class="hint" id="h-exp"></div></div>
     <div class="box"><div class="row"><div class="lab" id="l-rate"></div><div class="val" id="v-rate"></div></div>
       <input type="range" id="rate" min="1" max="15" step="0.5"><div class="mm"><span>1%</span><span>15%</span></div></div>
@@ -131,12 +134,22 @@ body.kids{--bg:#e6f4ff;--gold:#ff5d73;--card:#ffffff;--line:#bfe0f7;background:v
 
 <script>
 var COLORS=["#c8b89a","#a8c5a0","#7eb8c9","#9b8ec4","#d4826a"], CH=260;
-var s={cur:35,ret:65,bal:0,con:0,exp:0,rate:8,hover:null};
+var s={cur:35,ret:65,bal:0,con:0,exp:0,rate:8,hover:null,cmp:0};
 var kids=false, saved=null;
-var KID_DEFAULTS={cur:10,ret:50,bal:100,con:100,exp:12000,rate:8};
+var KID_DEFAULTS={cur:10,ret:50,bal:100,con:100,exp:0,rate:8};
+var ITEMS=[
+  {p:12,n:"movie tickets",t:"Popcorn not included."},
+  {p:15,n:"large pizzas",t:"Your money worked while you slept."},
+  {p:60,n:"new video games",t:"All from saving a little and waiting."},
+  {p:300,n:"game consoles",t:"Controllers sold separately."},
+  {p:1000,n:"brand-new iPhones",t:"Time did most of the work."},
+  {p:15000,n:"used cars",t:"Parking spots sold separately."},
+  {p:35000,n:"of mom's cars",t:"Wave to the neighbors!"},
+  {p:400000,n:"family houses",t:"Yes, with a yard."}
+];
 var TEXT={
   n:{eb:"Financial Independence Analysis",h1t:"Contribution Impact","l-cur":"Current Age","l-ret":"Retire Age","l-bal":"Starting Balance","l-con":"Monthly Contribution","l-exp":"Estimated Annual Expenses in Retirement","l-rate":"Growth Rate",mode:"Kids mode"},
-  k:{eb:"Money magic for kids",h1t:"Make your money grow","l-cur":"How old are you now?","l-ret":"Age you want to stop working","l-bal":"Money you have now","l-con":"Money you save each month","l-exp":"Money you'd spend each year","l-rate":"How fast your money grows",mode:"Back to grown-up mode"}
+  k:{eb:"Money magic for kids",h1t:"Make your money grow","l-cur":"How old are you now?","l-ret":"How old will you be when you need the money?","l-bal":"Money you have now","l-con":"Money you save each month","l-exp":"Money you'd spend each year","l-rate":"How fast your money grows",mode:"Back to grown-up mode"}
 };
 var $=function(id){return document.getElementById(id)};
 
@@ -198,15 +211,20 @@ function render(){
 
   // Kids result panel
   if(kids){
-    var val=sc[2].value, pct=fi>0?Math.min(val/fi*100,100):0, msg;
-    if(fi<=0) msg="Type in what you'd spend each year to set a goal.";
-    else if(val>=fi) msg="You hit your goal! Your money can now pay your bills forever.";
-    else msg="You're "+Math.floor(pct)+"% of the way to your goal. Try saving more each month or starting earlier!";
-    $("kid").innerHTML='<div class="kid"><div class="lab">By age '+s.ret+' you could have</div>'
-      +'<div class="big">'+fmt(val)+'</div>'
-      +'<div class="lab">Your goal: '+fmt(fi)+'</div>'
-      +'<div class="pb"><i style="width:'+pct+'%"></i></div>'
-      +'<p class="msg">'+msg+'</p></div>';
+    if(years<=0){
+      $("kid").innerHTML='<div class="kid"><p class="cmp">Move the second slider past your age to watch your money grow.</p></div>';
+    } else {
+      var val=sc[2].value, put=s.bal+s.con*12*years, grew=val-put, cmp="";
+      var ok=ITEMS.filter(function(it){var n=Math.floor(val/it.p);return n>=2&&n<=2000});
+      if(ok.length){var it=ok[s.cmp%ok.length];cmp="That's more than "+Math.floor(val/it.p).toLocaleString()+" "+it.n+". "+it.t}
+      var sum=grew>0?"You put in "+fmt(put)+". Your money grew the other "+fmt(grew)+" all by itself."+(grew>put?" It made more than you did!":""):"";
+      $("kid").innerHTML='<div class="kid"><div class="lab">By age '+s.ret+' you could have</div>'
+        +'<div class="big">'+fmt(val)+'</div>'
+        +(cmp?'<p class="cmp">'+cmp+'</p>':'')
+        +(sum?'<p class="sum">'+sum+'</p>':'')
+        +(ok.length?'<button type="button" class="more" data-more="1">Show me another</button>':'')
+        +'</div>';
+    }
   } else $("kid").innerHTML="";
 }
 
@@ -219,15 +237,19 @@ function setKids(on){
   if(on){
     saved={cur:s.cur,ret:s.ret,bal:s.bal,con:s.con,exp:s.exp,rate:s.rate};
     for(var k in KID_DEFAULTS) s[k]=KID_DEFAULTS[k];
+    s.cmp=Math.floor(Math.random()*1000);
   } else if(saved){
     for(var k2 in saved) s[k2]=saved[k2];
   }
   s.hover=null;
+  $("ret").min=on?5:18; $("ret").max=on?80:90;
+  $("mm-a").textContent=on?"Age 5":"Age 18"; $("mm-b").textContent=on?"Age 80":"Age 90";
   document.body.classList.toggle("kids",on);
   document.documentElement.style.colorScheme=on?"light":"dark";
   sync(); render();
 }
 $("mode").addEventListener("click",function(){setKids(!kids)});
+$("kid").addEventListener("click",function(e){if(e.target.closest("[data-more]")){s.cmp++;render()}});
 
 function pick(e){var t=e.target.closest("[data-i]");if(!t)return;var i=+t.getAttribute("data-i");s.hover=s.hover===i?null:i;render()}
 ["bi","xl","tbl"].forEach(function(id){$(id).addEventListener("click",pick)});
