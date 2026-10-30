@@ -13,15 +13,17 @@ html{scroll-padding-top:env(safe-area-inset-top,0px);background:var(--bg)}
 *,*::before,*::after{box-sizing:inherit}
 body{margin:0;background:var(--bg);color:var(--text);font-family:'Inter',system-ui,-apple-system,'Segoe UI',Roboto,sans-serif;padding:40px 20px 60px;min-height:100vh;font-variant-numeric:tabular-nums}
 .w{max-width:740px;margin:0 auto}
+.top{display:flex;justify-content:flex-end;margin-bottom:20px}
+.mode{min-height:44px;padding:10px 18px;border-radius:999px;border:2px solid var(--acc);background:var(--card);color:var(--acc);font:600 13px 'Inter',system-ui,sans-serif;cursor:pointer}
 .eyebrow{font-size:12px;color:var(--acc);letter-spacing:.08em;text-transform:uppercase;font-weight:700;margin-bottom:8px}
 h1{font-size:clamp(26px,5vw,38px);color:var(--text);margin:0 0 8px;line-height:1.15;font-weight:800;letter-spacing:-.02em}
-h1 span{color:var(--acc)}
+h1 #ttl{color:var(--acc)}
 .sub{color:var(--muted);font-size:14px;margin:0 0 28px;line-height:1.6}
 .ctl{display:flex;flex-direction:column;gap:12px;margin-bottom:28px}
 .box{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:18px 20px;box-shadow:var(--shadow)}
-.row{display:flex;justify-content:space-between;align-items:baseline;margin-bottom:12px}
+.row{display:flex;justify-content:space-between;align-items:baseline;margin-bottom:12px;gap:12px}
 .lab{font-size:12px;color:var(--muted);letter-spacing:.04em;text-transform:uppercase;font-weight:600}
-.val{font-size:24px;color:var(--acc);font-weight:700}
+.val{font-size:24px;color:var(--acc);font-weight:700;white-space:nowrap}
 .mm{display:flex;justify-content:space-between;margin-top:4px;font-size:11px;color:var(--faint)}
 input[type=range]{-webkit-appearance:none;appearance:none;width:100%;height:8px;border-radius:4px;background:var(--track);outline:none;margin:12px 0}
 input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:28px;height:28px;border-radius:50%;background:var(--thumb);border:3px solid var(--acc);box-shadow:0 2px 6px rgba(31,42,77,.25)}
@@ -59,30 +61,61 @@ input[type=range]::-moz-range-thumb{width:24px;height:24px;border-radius:50%;bac
 .tr.h{font-size:11px;color:var(--muted);letter-spacing:.06em;text-transform:uppercase;font-weight:600;cursor:default}
 .tr span+span{text-align:right}
 .foot{font-size:11px;color:var(--faint);text-align:center;margin-top:20px}
+
+/* ---------- Kids mode ---------- */
+#kid{display:none}
+html.kids:not(.x){--bg:#e6f4ff;--card:#ffffff;--line:#bfe0f7;--text:#2b2a6b;--muted:#4a4990;--faint:#7a79b0;--acc:#ff5d73;--good:#2e9e4f;--track:#bfe0f7;--thumb:#ffffff;--tint:rgba(255,93,115,.06);--input:#ffffff;--shadow:none;color-scheme:light}
+body.kids{font-family:ui-rounded,'Arial Rounded MT Bold','Nunito',system-ui,sans-serif}
+.kids .mode{background:#ff5d73;border-color:#ff5d73;color:#fff;font-family:inherit;font-weight:700}
+.kids .eyebrow{letter-spacing:.04em;text-transform:none;font-size:14px;font-weight:700}
+.kids h1{font-weight:800}
+.kids .sub{font-size:14px}
+.kids .lab{letter-spacing:0;text-transform:none;font-size:15px;font-weight:700}
+.kids .val{font-weight:800}
+.kids .mm{font-size:11px}
+.kids .box{border-width:2px;border-radius:18px;box-shadow:none}
+.kids input[type=range]::-webkit-slider-thumb{box-shadow:0 0 0 4px #ffd23f,0 2px 8px rgba(43,42,107,.25)}
+.kids .ent input{font-family:inherit;font-weight:700}
+.kids .hint{font-size:13px}
+.kids .chart,.kids #card,.kids .tbl,.kids .foot,.kids #b-exp{display:none}
+.kids #kid{display:block;margin-bottom:24px}
+.kid{background:#fff;border:2px solid #ffd23f;border-radius:22px;padding:24px}
+.kid .big{font-size:clamp(34px,9vw,52px);font-weight:800;color:#ff5d73;line-height:1.1;margin:6px 0 18px}
+.pb{height:20px;border-radius:10px;background:#e6f4ff;overflow:hidden;margin-top:8px}
+.pb i{display:block;height:100%;border-radius:10px;background:#ffd23f;transition:width .5s cubic-bezier(.4,0,.2,1)}
+.kid .cmp{font-size:20px;line-height:1.4;margin:0 0 16px;color:#2b2a6b;font-weight:800}
+.kid .sum{font-size:16px;line-height:1.5;margin:0 0 18px;color:#4a4990;font-weight:700}
+.kid .more{min-height:44px;padding:10px 20px;border-radius:999px;border:2px solid #ff5d73;background:#fff;color:#ff5d73;font:700 15px ui-rounded,'Arial Rounded MT Bold',system-ui,sans-serif;cursor:pointer}
+.kid .more:active{background:#ff5d73;color:#fff}
+.kidfoot{display:none;font-size:12px;color:#5b5a99;text-align:center;margin-top:20px}
+.kids .kidfoot{display:block}
 </style>
 </head>
 <body>
 <div class="w">
-  <div class="eyebrow">Financial Independence Analysis</div>
-  <h1>Contribution Impact<span id="ttl"></span></h1>
+  <div class="top"><button type="button" class="mode" id="mode"></button></div>
+  <div class="eyebrow" id="eb"></div>
+  <h1><span id="h1t"></span><span id="ttl"></span></h1>
   <p class="sub" id="sub"></p>
 
   <div class="ctl">
-    <div class="box"><div class="row"><div class="lab">Current Age</div><div class="val" id="v-cur"></div></div>
+    <div class="box"><div class="row"><div class="lab" id="l-cur"></div><div class="val" id="v-cur"></div></div>
       <input type="range" id="cur" min="5" max="80" step="1"><div class="mm"><span>Age 5</span><span>Age 80</span></div></div>
-    <div class="box"><div class="row"><div class="lab">Retire Age</div><div class="val" id="v-ret"></div></div>
-      <input type="range" id="ret" min="18" max="90" step="1"><div class="mm"><span>Age 18</span><span>Age 90</span></div></div>
+    <div class="box"><div class="row"><div class="lab" id="l-ret"></div><div class="val" id="v-ret"></div></div>
+      <input type="range" id="ret" min="18" max="90" step="1"><div class="mm"><span id="mm-a">Age 18</span><span id="mm-b">Age 90</span></div></div>
     <div class="g2">
-      <div class="box"><div class="lab" style="margin-bottom:12px">Starting Balance</div>
+      <div class="box"><div class="lab" id="l-bal" style="margin-bottom:12px"></div>
         <div class="ent"><b>$</b><input id="bal" type="text" inputmode="numeric"></div><div class="hint" id="h-bal"></div></div>
-      <div class="box"><div class="lab" style="margin-bottom:12px">Monthly Contribution</div>
+      <div class="box"><div class="lab" id="l-con" style="margin-bottom:12px"></div>
         <div class="ent"><b>$</b><input id="con" type="text" inputmode="numeric"><small>/mo</small></div><div class="hint" id="h-con"></div></div>
     </div>
-    <div class="box"><div class="lab" style="margin-bottom:12px">Estimated Annual Expenses in Retirement</div>
+    <div class="box" id="b-exp"><div class="lab" id="l-exp" style="margin-bottom:12px"></div>
       <div class="ent"><b>$</b><input id="exp" type="text" inputmode="numeric"><small>/yr</small></div><div class="hint" id="h-exp"></div></div>
-    <div class="box"><div class="row"><div class="lab">Growth Rate</div><div class="val" id="v-rate"></div></div>
+    <div class="box"><div class="row"><div class="lab" id="l-rate"></div><div class="val" id="v-rate"></div></div>
       <input type="range" id="rate" min="1" max="15" step="0.5"><div class="mm"><span>1%</span><span>15%</span></div></div>
   </div>
+
+  <div id="kid"></div>
 
   <div class="chart">
     <div class="plot"><div class="yax" id="yax"></div><div class="bars"><div id="gl"></div><div class="bi" id="bi"></div></div></div>
@@ -96,34 +129,61 @@ input[type=range]::-moz-range-thumb{width:24px;height:24px;border-radius:50%;bac
   <div id="card"></div>
   <div class="tbl" id="tbl"></div>
   <div class="foot" id="foot"></div>
+  <div class="kidfoot">Pretend numbers to practice with. Not real financial advice.</div>
 </div>
 
 <script>
 var COLORS=["#8a96b8","#5aa832","#4b6bdb","#e69a1f","#e0605f"], CH=260;
-var s={cur:35,ret:65,bal:0,con:0,exp:0,rate:8,hover:null};
+var s={cur:35,ret:65,bal:0,con:0,exp:0,rate:8,hover:null,cmp:0};
+var kids=false, saved=null;
+var KID_DEFAULTS={cur:10,ret:50,bal:100,con:100,exp:0,rate:8};
+var ITEMS=[
+  {p:12,n:"movie tickets",t:"Popcorn not included."},
+  {p:15,n:"large pizzas",t:"Your money worked while you slept."},
+  {p:60,n:"new video games",t:"All from saving a little and waiting."},
+  {p:300,n:"game consoles",t:"Controllers sold separately."},
+  {p:1000,n:"brand-new iPhones",t:"Time did most of the work."},
+  {p:15000,n:"used cars",t:"Parking spots sold separately."},
+  {p:35000,n:"of mom's cars",t:"Wave to the neighbors!"},
+  {p:400000,n:"family houses",t:"Yes, with a yard."}
+];
+var TEXT={
+  n:{eb:"Financial Independence Analysis",h1t:"Contribution Impact","l-cur":"Current Age","l-ret":"Retire Age","l-bal":"Starting Balance","l-con":"Monthly Contribution","l-exp":"Estimated Annual Expenses in Retirement","l-rate":"Growth Rate",mode:"Kids mode"},
+  k:{eb:"Money magic for kids",h1t:"Make your money grow","l-cur":"How old are you now?","l-ret":"How old will you be when you need the money?","l-bal":"Money you have now","l-con":"Money you save each month","l-exp":"Money you'd spend each year","l-rate":"How fast your money grows",mode:"Back to grown-up mode"}
+};
 var $=function(id){return document.getElementById(id)};
 
 function fv(b,m,rate,y){if(y<=0)return b;var r=rate/12,n=y*12,g=Math.pow(1+r,n);return b*g+(m>0?m*((g-1)/r):0)}
-function fmt(n){if(n>=1e6)return "$"+(n/1e6).toFixed(2)+"M";if(n>=1e3)return "$"+Math.round(n).toLocaleString();return "$"+Math.round(n)}
+function fmt(n){if(n>=1e6)return "$"+(n/1e6).toFixed(2)+"M";if(n>=1e3)return "$"+Math.round(n).toLocaleString("en-US");return "$"+Math.round(n)}
 function fmtShort(n){if(n>=1e6)return "$"+(n/1e6).toFixed(1)+"M";if(n>=1e3)return "$"+(n/1e3).toFixed(0)+"K";return "$"+Math.round(n)}
 function fmtBal(v){if(v>=1e6)return "$"+(v/1e6).toFixed(2)+"M";if(v>=1e3)return "$"+(v/1e3).toFixed(1)+"K";return "$"+v}
 function fmtCon(v){if(v===0)return "$0/mo";if(v>=1e3)return "$"+(v/1e3).toFixed(1)+"K/mo";return "$"+v+"/mo"}
-function num(t){var n=Number(String(t).replace(/,/g,""));return isNaN(n)?null:Math.max(0,n)}
+function fmtIn(n){return n.toLocaleString("en-US")}
+
+function applyText(){
+  var t=kids?TEXT.k:TEXT.n;
+  Object.keys(t).forEach(function(k){$(k).textContent=t[k]});
+}
 
 function render(){
+  applyText();
   var years=Math.max(s.ret-s.cur,0), r=s.rate/100, b=s.con;
   var sc=[["$0/mo","Coast FI",0],[fmtCon(Math.round(b*.5)),"Half",b*.5],[fmtCon(b),"Base",b],[fmtCon(Math.round(b*1.5)),"1.5×",b*1.5],[fmtCon(b*2),"2×",b*2]]
     .map(function(x,i){return {label:x[0],sub:x[1],color:COLORS[i],value:fv(s.bal,x[2],r,years)}});
   var coast=sc[0].value, max=Math.max.apply(null,sc.map(function(x){return x.value})), gm=max*1.12||1;
   var gv=[0,1,2,3,4].map(function(i){return gm/4*i});
 
-  $("ttl").textContent=" · Age "+s.cur+" → "+s.ret;
-  $("sub").textContent=years+" years · "+s.rate+"% growth · "+fmtBal(s.bal)+" starting balance";
+  $("ttl").textContent=kids?" · Age "+s.cur+" to "+s.ret:" · Age "+s.cur+" → "+s.ret;
+  $("sub").textContent=kids
+    ?years+" years of growing · "+s.rate+"% a year · starting with "+fmtBal(s.bal)
+    :years+" years · "+s.rate+"% growth · "+fmtBal(s.bal)+" starting balance";
   $("v-cur").textContent="Age "+s.cur; $("v-ret").textContent="Age "+s.ret; $("v-rate").textContent=s.rate+"%";
   $("h-bal").textContent=fmtBal(s.bal); $("h-con").textContent=fmtCon(s.con);
   var fi=s.exp/.04;
   function swr(v){return fmt(v*.04)+"/yr"}
-  $("h-exp").textContent="FI number: "+fmt(fi)+" (25× expenses, 4% rule)";
+  $("h-exp").textContent=kids
+    ?"Your goal: "+fmt(fi)+". That's enough to pay your bills forever!"
+    :"FI number: "+fmt(fi)+" (25× expenses, 4% rule)";
   $("foot").textContent="Not financial advice · "+s.rate+"% nominal annual growth · constant contributions · age "+s.cur+" today";
 
   $("yax").innerHTML=gv.map(function(v){return "<div>"+fmtShort(v)+"</div>"}).join("");
@@ -148,7 +208,48 @@ function render(){
     +sc.map(function(x,i){var d=x.value-coast;
       return '<div class="tr" data-i="'+i+'" style="'+(h===i?'background:var(--tint)':'')+'"><span style="color:'+x.color+'">'+x.sub+' · '+x.label+'</span>'
       +'<span>'+fmt(x.value)+'</span><span style="color:'+(d===0?'var(--faint)':'var(--good)')+'">'+(d===0?"—":"+"+fmt(d))+'</span><span style="color:'+(fi>0&&x.value>=fi?'var(--good)':'var(--muted)')+'">'+swr(x.value)+'</span></div>'}).join("");
+
+  // Kids result panel
+  if(kids){
+    if(years<=0){
+      $("kid").innerHTML='<div class="kid"><p class="cmp">Move the second slider past your age to watch your money grow.</p></div>';
+    } else {
+      var val=sc[2].value, put=s.bal+s.con*12*years, grew=val-put, cmp="";
+      var ok=ITEMS.filter(function(it){var n=Math.floor(val/it.p);return n>=2&&n<=2000});
+      if(ok.length){var it=ok[s.cmp%ok.length];cmp="That's more than "+Math.floor(val/it.p).toLocaleString("en-US")+" "+it.n+". "+it.t}
+      var sum=grew>0?"You put in "+fmt(put)+". Your money grew the other "+fmt(grew)+" all by itself."+(grew>put?" It made more than you did!":""):"";
+      $("kid").innerHTML='<div class="kid"><div class="lab">By age '+s.ret+' you could have</div>'
+        +'<div class="big">'+fmt(val)+'</div>'
+        +(cmp?'<p class="cmp">'+cmp+'</p>':'')
+        +(sum?'<p class="sum">'+sum+'</p>':'')
+        +(ok.length?'<button type="button" class="more" data-more="1">Show me another</button>':'')
+        +'</div>';
+    }
+  } else $("kid").innerHTML="";
 }
+
+function sync(){
+  $("cur").value=s.cur; $("ret").value=s.ret; $("rate").value=s.rate;
+  ["bal","con","exp"].forEach(function(k){$(k).value=fmtIn(s[k])});
+}
+function setKids(on){
+  kids=on;
+  if(on){
+    saved={cur:s.cur,ret:s.ret,bal:s.bal,con:s.con,exp:s.exp,rate:s.rate};
+    for(var k in KID_DEFAULTS) s[k]=KID_DEFAULTS[k];
+    s.cmp=Math.floor(Math.random()*1000);
+  } else if(saved){
+    for(var k2 in saved) s[k2]=saved[k2];
+  }
+  s.hover=null;
+  $("ret").min=on?5:18; $("ret").max=on?80:90;
+  $("mm-a").textContent=on?"Age 5":"Age 18"; $("mm-b").textContent=on?"Age 80":"Age 90";
+  document.body.classList.toggle("kids",on);
+  document.documentElement.classList.toggle("kids",on);
+  sync(); render();
+}
+$("mode").addEventListener("click",function(){setKids(!kids)});
+$("kid").addEventListener("click",function(e){if(e.target.closest("[data-more]")){s.cmp++;render()}});
 
 function pick(e){var t=e.target.closest("[data-i]");if(!t)return;var i=+t.getAttribute("data-i");s.hover=s.hover===i?null:i;render()}
 ["bi","xl","tbl"].forEach(function(id){$(id).addEventListener("click",pick)});
@@ -158,18 +259,18 @@ function pick(e){var t=e.target.closest("[data-i]");if(!t)return;var i=+t.getAtt
   el.addEventListener("input",function(){s[p[1]]=Number(el.value);render()});
 });
 function wire(id,key,max){
-  var el=$(id); el.value=s[key]?s[key].toLocaleString("en-US"):"";
+  var el=$(id); el.value=fmtIn(s[key]);
   el.addEventListener("input",function(){
     var pos=el.selectionStart, before=el.value.slice(0,pos).replace(/\D/g,"").length;
     var digits=el.value.replace(/\D/g,"").replace(/^0+(?=\d)/,"");
     var n=digits===""?0:Math.min(Number(digits),max);
-    el.value=digits===""?"":n.toLocaleString("en-US");
+    el.value=digits===""?"":fmtIn(n);
     var total=el.value.replace(/\D/g,"").length; before=Math.min(before,total);
     var c=0,i=0; while(i<el.value.length&&c<before){if(/\d/.test(el.value.charAt(i)))c++;i++}
     try{el.setSelectionRange(i,i)}catch(e){}
     s[key]=n; render();
   });
-  el.addEventListener("blur",function(){el.value=s[key].toLocaleString("en-US")});
+  el.addEventListener("blur",function(){el.value=fmtIn(s[key])});
 }
 wire("bal","bal",10000000); wire("con","con",1000000); wire("exp","exp",10000000);
 render();
